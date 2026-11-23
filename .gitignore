@@ -55,3 +55,6 @@ TODO.md
 .cellar
 # JDK + sbt fetched by scripts/build.sh on hosts without sbt
 .toolchain/
+
+# Local wrangler dev state
+.wrangler/
