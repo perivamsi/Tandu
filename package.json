@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "./scripts/build.sh",
     "preview": "vite preview",
     "deploy": "./deploy.sh",
     "test:e2e": "playwright test",
