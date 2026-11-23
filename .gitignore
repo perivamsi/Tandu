@@ -53,6 +53,8 @@ playwright/.cache/
 TODO.md
 
 .cellar
+.claude/worktrees
+
 # JDK + sbt fetched by scripts/build.sh on hosts without sbt
 .toolchain/
 
