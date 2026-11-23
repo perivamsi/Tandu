@@ -284,7 +284,34 @@ object Strings:
       findLabel: String,
       countLabel: String,
       countSheetName: String,
+      form: SeekAndFindForm,
       rules: Rules
+  )
+
+  /** Labels of the sheet builder form (print mode). */
+  final case class SeekAndFindForm(
+      preset: String,
+      task: String,
+      taskFind: String,
+      taskCount: String,
+      theme: String,
+      themeAll: String,
+      kinds: String,
+      perKind: String,
+      extras: String,
+      layout: String,
+      tidy: String,
+      mixed: String,
+      wild: String,
+      lookAlikes: String,
+      showCounts: String,
+      answer: String,
+      answerCircle: String,
+      answerWrite: String,
+      pages: String,
+      custom: String,
+      countWriteTitle: String,
+      countWriteLabel: String
   )
 
   final case class Offline(
@@ -329,7 +356,6 @@ object Strings:
       friend: TttVariant,
       computer: TttVariant,
       you: String,
-      computerName: String,
       thinking: String,
       computerWins: String
   )
@@ -1209,15 +1235,39 @@ object Strings:
       ),
       seekAndFind = SeekAndFindOff(
         printTitle = "Seek & Find — find and circle",
-        countPrintTitle = "Seek & Find — count and write",
-        sheetHint = "Print a sheet and circle every picture from the list — or count them and write the numbers.",
+        countPrintTitle = "Seek & Find — count and circle",
+        sheetHint = "Print a sheet and circle every picture from the list — or count them and circle the right numbers.",
         findLabel = "Find and circle:",
-        countLabel = "Count each picture and write the number in its box:",
+        countLabel = "Count each picture and circle the right number:",
         countSheetName = "Counting",
+        form = SeekAndFindForm(
+          preset = "Start from",
+          task = "Task",
+          taskFind = "Find and circle",
+          taskCount = "Count",
+          theme = "Theme",
+          themeAll = "All",
+          kinds = "Kinds of pictures",
+          perKind = "How many of each",
+          extras = "Other pictures",
+          layout = "Layout",
+          tidy = "Tidy",
+          mixed = "Mixed",
+          wild = "Wild",
+          lookAlikes = "Look-alike pictures",
+          showCounts = "Show how many to find",
+          answer = "Answer",
+          answerCircle = "Circle a number",
+          answerWrite = "Write the number",
+          pages = "Pages",
+          custom = "Custom",
+          countWriteTitle = "Seek & Find — count and write",
+          countWriteLabel = "Count each picture and write the number in its box:"
+        ),
         rules = Rules("How to play", List(
           "Look at the list at the top of the sheet.",
           "Find every matching picture in the big scene and circle it.",
-          "On the counting sheet, count each kind of picture and write the number in its box."
+          "On the counting sheet, count each kind of picture and circle the right number next to it."
         ))
       )
     ),
@@ -1241,7 +1291,6 @@ object Strings:
       friend = TttVariant("Two players", "Take turns on one device."),
       computer = TttVariant("Vs computer", "Play solo against the computer."),
       you = "You",
-      computerName = "Computer",
       thinking = "Computer is thinking…",
       computerWins = "Computer wins!"
     ),
@@ -1993,15 +2042,39 @@ object Strings:
       ),
       seekAndFind = SeekAndFindOff(
         printTitle = "Wyszukiwanka — znajdź i zakreśl",
-        countPrintTitle = "Wyszukiwanka — policz i zapisz",
-        sheetHint = "Wydrukuj kartkę i zakreśl wszystkie obrazki z listy — albo policz je i wpisz liczby.",
+        countPrintTitle = "Wyszukiwanka — policz i zakreśl",
+        sheetHint = "Wydrukuj kartkę i zakreśl wszystkie obrazki z listy — albo policz je i zakreśl właściwe liczby.",
         findLabel = "Znajdź i zakreśl:",
-        countLabel = "Policz obrazki każdego rodzaju i wpisz liczbę w okienko:",
+        countLabel = "Policz obrazki każdego rodzaju i zakreśl właściwą liczbę:",
         countSheetName = "Liczenie",
+        form = SeekAndFindForm(
+          preset = "Zacznij od",
+          task = "Zadanie",
+          taskFind = "Znajdź i zakreśl",
+          taskCount = "Policz",
+          theme = "Motyw",
+          themeAll = "Wszystkie",
+          kinds = "Rodzaje obrazków",
+          perKind = "Ile każdego rodzaju",
+          extras = "Inne obrazki",
+          layout = "Układ",
+          tidy = "Równy",
+          mixed = "Mieszany",
+          wild = "Szalony",
+          lookAlikes = "Podobne obrazki",
+          showCounts = "Pokaż, ile jest do znalezienia",
+          answer = "Odpowiedź",
+          answerCircle = "Zakreśl liczbę",
+          answerWrite = "Wpisz liczbę",
+          pages = "Strony",
+          custom = "Własne",
+          countWriteTitle = "Wyszukiwanka — policz i zapisz",
+          countWriteLabel = "Policz obrazki każdego rodzaju i wpisz liczbę w okienko:"
+        ),
         rules = Rules("Jak grać", List(
           "Spójrz na listę u góry kartki.",
           "Odszukaj w scenie każdy pasujący obrazek i zakreśl go.",
-          "Na kartce z liczeniem policz obrazki każdego rodzaju i wpisz liczbę w okienko."
+          "Na kartce z liczeniem policz obrazki każdego rodzaju i zakreśl właściwą liczbę obok."
         ))
       )
     ),
@@ -2025,7 +2098,6 @@ object Strings:
       friend = TttVariant("Dwóch graczy", "Grajcie na zmianę na jednym urządzeniu."),
       computer = TttVariant("Z komputerem", "Zagraj sam przeciwko komputerowi."),
       you = "Ty",
-      computerName = "Komputer",
       thinking = "Komputer myśli…",
       computerWins = "Komputer wygrywa!"
     ),
@@ -2777,15 +2849,39 @@ object Strings:
       ),
       seekAndFind = SeekAndFindOff(
         printTitle = "Busca y encuentra — encuentra y rodea",
-        countPrintTitle = "Busca y encuentra — cuenta y escribe",
-        sheetHint = "Imprime una hoja y rodea todos los dibujos de la lista — o cuéntalos y escribe los números.",
+        countPrintTitle = "Busca y encuentra — cuenta y rodea",
+        sheetHint = "Imprime una hoja y rodea todos los dibujos de la lista — o cuéntalos y rodea los números correctos.",
         findLabel = "Busca y rodea:",
-        countLabel = "Cuenta cada dibujo y escribe el número en su casilla:",
+        countLabel = "Cuenta cada dibujo y rodea el número correcto:",
         countSheetName = "Contar",
+        form = SeekAndFindForm(
+          preset = "Empezar con",
+          task = "Tarea",
+          taskFind = "Busca y rodea",
+          taskCount = "Cuenta",
+          theme = "Tema",
+          themeAll = "Todos",
+          kinds = "Tipos de dibujos",
+          perKind = "Cuántos de cada uno",
+          extras = "Otros dibujos",
+          layout = "Disposición",
+          tidy = "Ordenada",
+          mixed = "Mixta",
+          wild = "Alocada",
+          lookAlikes = "Dibujos parecidos",
+          showCounts = "Mostrar cuántos hay que encontrar",
+          answer = "Respuesta",
+          answerCircle = "Rodea un número",
+          answerWrite = "Escribe el número",
+          pages = "Páginas",
+          custom = "Personalizado",
+          countWriteTitle = "Busca y encuentra — cuenta y escribe",
+          countWriteLabel = "Cuenta cada dibujo y escribe el número en su casilla:"
+        ),
         rules = Rules("Cómo jugar", List(
           "Mira la lista en la parte de arriba de la hoja.",
           "Encuentra cada dibujo de la lista en la escena y rodéalo.",
-          "En la hoja de contar, cuenta cada tipo de dibujo y escribe el número en su casilla."
+          "En la hoja de contar, cuenta cada tipo de dibujo y rodea el número correcto a su lado."
         ))
       )
     ),
@@ -2809,7 +2905,6 @@ object Strings:
       friend = TttVariant("Dos jugadores", "Turnaos en un mismo dispositivo."),
       computer = TttVariant("Contra el ordenador", "Juega solo contra el ordenador."),
       you = "Tú",
-      computerName = "Ordenador",
       thinking = "El ordenador está pensando…",
       computerWins = "¡Gana el ordenador!"
     ),
@@ -3561,15 +3656,39 @@ object Strings:
       ),
       seekAndFind = SeekAndFindOff(
         printTitle = "Cherche et trouve — trouve et entoure",
-        countPrintTitle = "Cherche et trouve — compte et écris",
-        sheetHint = "Imprimez la feuille et entourez toutes les images de la liste — ou comptez-les et écrivez les nombres.",
+        countPrintTitle = "Cherche et trouve — compte et entoure",
+        sheetHint = "Imprimez la feuille et entourez toutes les images de la liste — ou comptez-les et entourez les bons nombres.",
         findLabel = "Cherche et entoure :",
-        countLabel = "Compte chaque image et écris le nombre dans sa case :",
+        countLabel = "Compte chaque image et entoure le bon nombre :",
         countSheetName = "Comptage",
+        form = SeekAndFindForm(
+          preset = "Partir de",
+          task = "Tâche",
+          taskFind = "Cherche et entoure",
+          taskCount = "Compte",
+          theme = "Thème",
+          themeAll = "Tous",
+          kinds = "Sortes d'images",
+          perKind = "Combien de chaque sorte",
+          extras = "Autres images",
+          layout = "Disposition",
+          tidy = "Rangée",
+          mixed = "Mixte",
+          wild = "Folle",
+          lookAlikes = "Images qui se ressemblent",
+          showCounts = "Afficher combien il faut en trouver",
+          answer = "Réponse",
+          answerCircle = "Entoure un nombre",
+          answerWrite = "Écris le nombre",
+          pages = "Pages",
+          custom = "Personnalisé",
+          countWriteTitle = "Cherche et trouve — compte et écris",
+          countWriteLabel = "Compte chaque image et écris le nombre dans sa case :"
+        ),
         rules = Rules("Comment jouer", List(
           "Regarde la liste en haut de la feuille.",
           "Trouve chaque image de la liste dans la scène et entoure-la.",
-          "Sur la feuille de comptage, compte chaque sorte d'image et écris le nombre dans sa case."
+          "Sur la feuille de comptage, compte chaque sorte d'image et entoure le bon nombre à côté."
         ))
       )
     ),
@@ -3593,7 +3712,6 @@ object Strings:
       friend = TttVariant("Deux joueurs", "Jouez chacun votre tour sur le même appareil."),
       computer = TttVariant("Contre l'ordinateur", "Joue seul contre l'ordinateur."),
       you = "Toi",
-      computerName = "Ordinateur",
       thinking = "L'ordinateur réfléchit…",
       computerWins = "L'ordinateur gagne !"
     ),
@@ -4345,15 +4463,39 @@ object Strings:
       ),
       seekAndFind = SeekAndFindOff(
         printTitle = "Wimmelbild — finde und kreise ein",
-        countPrintTitle = "Wimmelbild — zähle und schreibe",
-        sheetHint = "Druckt ein Blatt aus und kreist alle Bilder aus der Liste ein — oder zählt sie und schreibt die Zahlen auf.",
+        countPrintTitle = "Wimmelbild — zähle und kreise ein",
+        sheetHint = "Druckt ein Blatt aus und kreist alle Bilder aus der Liste ein — oder zählt sie und kreist die richtigen Zahlen ein.",
         findLabel = "Finde und kreise ein:",
-        countLabel = "Zähle jedes Bild und schreibe die Zahl in das Kästchen:",
+        countLabel = "Zähle jedes Bild und kreise die richtige Zahl ein:",
         countSheetName = "Zählen",
+        form = SeekAndFindForm(
+          preset = "Vorlage",
+          task = "Aufgabe",
+          taskFind = "Finden und einkreisen",
+          taskCount = "Zählen",
+          theme = "Thema",
+          themeAll = "Alle",
+          kinds = "Bildsorten",
+          perKind = "Wie viele von jeder Sorte",
+          extras = "Andere Bilder",
+          layout = "Anordnung",
+          tidy = "Ordentlich",
+          mixed = "Gemischt",
+          wild = "Wild",
+          lookAlikes = "Ähnliche Bilder",
+          showCounts = "Anzahl der gesuchten Bilder zeigen",
+          answer = "Antwort",
+          answerCircle = "Zahl einkreisen",
+          answerWrite = "Zahl schreiben",
+          pages = "Seiten",
+          custom = "Eigene",
+          countWriteTitle = "Wimmelbild — zähle und schreibe",
+          countWriteLabel = "Zähle jedes Bild und schreibe die Zahl in das Kästchen:"
+        ),
         rules = Rules("So wird gespielt", List(
           "Schau dir die Liste oben auf dem Blatt an.",
           "Finde jedes Bild aus der Liste in der Szene und kreise es ein.",
-          "Auf dem Zählblatt zählst du jede Bildsorte und schreibst die Zahl ins Kästchen."
+          "Auf dem Zählblatt zählst du jede Bildsorte und kreist die richtige Zahl daneben ein."
         ))
       )
     ),
@@ -4377,7 +4519,6 @@ object Strings:
       friend = TttVariant("Zwei Spieler", "Abwechselnd auf einem Gerät spielen."),
       computer = TttVariant("Gegen den Computer", "Spiel allein gegen den Computer."),
       you = "Du",
-      computerName = "Computer",
       thinking = "Der Computer denkt nach…",
       computerWins = "Der Computer gewinnt!"
     ),
