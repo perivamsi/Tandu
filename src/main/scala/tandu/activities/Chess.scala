@@ -412,7 +412,7 @@ object Chess extends Activity:
   private def boardView(stateSig: Signal[State], onTap: Int => Unit): HtmlElement =
     val hints         = stateSig.map(hintsOf).distinct
     val checkedKingSq = stateSig.map(checkedKingOf).distinct
-    div(
+    tandu.ui.Components.fit("1")(div(
       cls := "board chess-board",
       styleAttr := s"grid-template-columns: repeat($Size, 1fr);",
       (0 until Size * Size).map { i =>
@@ -444,7 +444,7 @@ object Chess extends Activity:
           onClick --> (_ => onTap(i))
         )
       }
-    )
+    ))
 
   private def renderPlay(): HtmlElement =
     val state = Var(initial)

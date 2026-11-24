@@ -551,8 +551,8 @@ object SeekAndFind extends Activity:
       p: Puzzle,
       marked: Signal[Set[Int]],
       onTap: Option[(Item, Int, dom.Element) => Unit]
-  ): SvgElement =
-    svg.svg(
+  ): HtmlElement =
+    tandu.ui.Components.fit(s"${fmt(p.w)} / ${fmt(p.h)}")(svg.svg(
       svg.cls := "snf-board",
       svg.viewBox := s"0 0 ${fmt(p.w)} ${fmt(p.h)}",
       p.items.zipWithIndex.map { (item, i) =>
@@ -575,7 +575,7 @@ object SeekAndFind extends Activity:
           svg.circle(svg.cls := "snf-ring", svg.r := fmt(item.size * 0.58))
         )
       }
-    )
+    ))
 
   // ---------- count mode ----------
 

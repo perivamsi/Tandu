@@ -244,7 +244,7 @@ object LetterTracing extends Activity:
     div(
       cls := "stack-lg",
       langChange,
-      canvasEl,
+      tandu.ui.Components.fit("7 / 5")(canvasEl),
       div(
         cls := "row no-print",
         styleAttr := "justify-content: center; align-items: center; gap: 0.75rem;",

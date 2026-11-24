@@ -224,10 +224,10 @@ object Hangman extends Activity:
       span(cls := "hangman-lives__value", remaining.toString)
     )
 
-  private def gallowsView(stagesSig: Signal[Int]): SvgElement =
+  private def gallowsView(stagesSig: Signal[Int]): HtmlElement =
     import com.raquo.laminar.api.L.svg as S
     def at(n: Int) = S.display <-- stagesSig.map(s => if s >= n then "inline" else "none")
-    S.svg(
+    tandu.ui.Components.fit("200 / 220")(S.svg(
       S.cls := "hangman-svg",
       S.viewBox := "0 0 200 220",
       S.width := "180",
@@ -252,4 +252,4 @@ object Hangman extends Activity:
       S.line(S.cls := "hangman-part", S.x1 := "140", S.y1 := "140", S.x2 := "120", S.y2 := "175", at(9)),
       // 10: right leg
       S.line(S.cls := "hangman-part", S.x1 := "140", S.y1 := "140", S.x2 := "160", S.y2 := "175", at(10))
-    )
+    ))

@@ -612,7 +612,7 @@ object DotToDot extends Activity:
       svg.href := url
     )
 
-  private def board(p: Puzzle, progress: Var[Int]): SvgElement =
+  private def board(p: Puzzle, progress: Var[Int]): HtmlElement =
     val n = p.dots.size
     val doneSig = progress.signal.map(_ >= n)
 
@@ -623,7 +623,7 @@ object DotToDot extends Activity:
       val sel = if k >= n then p.dots :+ p.dots.head else p.dots.take(k)
       sel.map(d => s"${fmt(d.x)},${fmt(d.y)}").mkString(" ")
 
-    svg.svg(
+    tandu.ui.Components.fit("1")(svg.svg(
       svg.cls <-- doneSig.map(d => if d then "dots-svg is-done" else "dots-svg"),
       svg.viewBox := s"0 0 ${View.toInt} ${View.toInt}",
       // The real picture sits exactly under the traced outline, invisible
@@ -649,7 +649,7 @@ object DotToDot extends Activity:
           )
         )
       }
-    )
+    ))
 
   private def fmt(v: Double): String = f"$v%.2f"
 

@@ -155,7 +155,7 @@ object TicTacToe extends Activity:
           span(child.text <-- indicatorSignal)
         )
       ),
-      div(
+      tandu.ui.Components.fit("1")(div(
         cls := "board ttt-board",
         cls("board--dense") := v.dense,
         styleAttr := s"grid-template-columns: repeat(${v.size}, 1fr);",
@@ -169,7 +169,7 @@ object TicTacToe extends Activity:
             child.text <-- cv.map(_.mark.map(_.label).getOrElse("")),
             onClick --> (_ => play(i))
           )
-      ),
+      )),
       div(
         cls := "row no-print",
         styleAttr := "justify-content: center;",

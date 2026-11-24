@@ -23,7 +23,7 @@ object Board:
       onTap: Option[Cell => Unit],
       highlight: Option[Cell] = None
   ): HtmlElement =
-    div(
+    tandu.ui.Components.fit("1")(div(
       cls := "board bs-grid",
       allCells.zipWithIndex.map { (cellPos, i) =>
         val viewSig = cells.map(_(i)).distinct
@@ -44,7 +44,7 @@ object Board:
             case None          => emptyMod
         )
       }
-    )
+    ))
 
   private val emptyMod: Modifier[HtmlElement] = emptyNode
 

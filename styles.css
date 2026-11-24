@@ -250,6 +250,9 @@ select { font-family: inherit; font-size: inherit; }
 
 .stack > * + * { margin-top: var(--space-3); }
 .stack-lg > * + * { margin-top: var(--space-5); }
+/* Boards whose own `margin: 0 auto` used to cancel the stack spacing above
+   them: keep that now that Components.fit wraps them. */
+.fit:has(> :is(.robot-board, .ms-board, .maze-svg, .dots-svg, .snf-board, .jigsaw-svg, .hangman-svg, .word-search-grid)) { margin-top: 0; }
 
 .row { display: flex; gap: var(--space-3); align-items: center; }
 .row--between { justify-content: space-between; }
@@ -3466,6 +3469,7 @@ label.field select { padding: var(--space-2) var(--space-3); border-radius: var(
   touch-action: none;         /* claim drags so the page doesn't scroll under them */
   user-select: none;
 }
+.jigsaw-svg--side { aspect-ratio: 990 / 600; }   /* landscape: board + gap + side tray */
 .jigsaw-svg.is-solved { aspect-ratio: 1 / 1; }   /* tray cropped away once done */
 .jigsaw-frame {
   fill: var(--color-surface);
@@ -4313,3 +4317,112 @@ label.field select { padding: var(--space-2) var(--space-3); border-radius: var(
 .wbk-gomoku-cell { border: 0 solid #999; }
 .wbk-gomoku-cell:not(:nth-child(10n)) { border-right-width: 0.3mm; }
 .wbk-gomoku-cell:nth-child(-n+90) { border-bottom-width: 0.3mm; }
+
+/* ---------- Landscape tablets (iPad) ----------
+   Phone-first, the app is one ~640px column that scrolls. In landscape that
+   leaves the side gutters empty while boards push the page past the fold.
+   Here, a page holding a game board (`.fit`, from Components.fit) becomes
+   exactly one screen tall: every ancestor of the board turns into a flex
+   column, and the `.fit` wrapper takes whatever height the header, status
+   and controls leave. The board inside sizes itself from that box via
+   container units, keeping its aspect ratio (--fit-ar). Its own max-width
+   still caps it. Phones and portrait are untouched. */
+@media (orientation: landscape) and (min-width: 900px) and (min-height: 560px) {
+  .app:has(.fit) {
+    height: 100dvh;
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-3);
+  }
+  .app:has(.fit) .header { padding-bottom: 0; }
+  .app:has(.fit) .stack-lg > * + * { margin-top: var(--space-3); }
+  .app:has(.fit) .stack > * + * { margin-top: var(--space-2); }
+
+  .app :has(.fit) {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .fit {
+    flex: 1 1 0;
+    min-height: 160px;   /* below this, let the page scroll rather than shrink */
+    container-type: size;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .fit > * {
+    flex: none;
+    width: min(100cqw, 100cqh * var(--fit-ar, 1));
+    max-width: none;   /* phone-era caps; the screen height is the limit here */
+    margin: 0;
+  }
+  .fit > canvas { height: auto; aspect-ratio: var(--fit-ar); }
+
+  .activity-bar { margin-top: var(--space-2); gap: var(--space-2); }
+
+  /* Jigsaw lays its tray beside the board here (Landscape.scala): a wide
+     shape, so let its column use the whole width. */
+  .app:has(.jigsaw-svg--side) { --col-w: 100vw; max-width: var(--col-w); }
+  /* Reading is a long list of short rows: two columns halve the scroll. */
+  .app:has(.reading-list) { --col-w: 100vw; max-width: var(--col-w); }
+  .reading-books { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Home in landscape (any height: it's a catalogue, scrolling is expected):
+   use the width for more columns instead of one long phone-width list. */
+@media (orientation: landscape) and (min-width: 900px) {
+  .app:has(.activity-grid) { max-width: 1120px; }
+  .activity-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .home-tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+  .home-tools > * + * { margin-top: 0; }
+}
+@media (orientation: landscape) and (min-width: 1240px) {
+  .activity-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* From 1060px (the narrowest current iPad in landscape is 1080) each side gutter
+   is ≥ 210px: float the re-suggest button there
+   instead of spending a row of height under the activity. */
+@media (orientation: landscape) and (min-width: 1060px) and (min-height: 560px) {
+  .activity-bar {
+    position: fixed;
+    right: max(var(--space-4), env(safe-area-inset-right));
+    bottom: max(var(--space-4), env(safe-area-inset-bottom));
+    margin: 0;
+    padding: 0;
+    z-index: 5;
+  }
+  .activity-bar__rule { display: none; }
+  .activity-bar .activity-resuggest { padding: var(--space-2) var(--space-3); max-width: calc(50vw - var(--col-w, 640px) / 2 - 2 * var(--space-4)); }
+  /* …but leave the gutters free for the header and re-suggest button. */
+  .app:has(.jigsaw-svg--side),
+  .app:has(.reading-list) { --col-w: max(640px, 100vw - 2 * 230px); }
+  .activity-bar .activity-resuggest__main { font-size: 17px; }
+
+  /* Activity header moves to the left gutter too (back, then glyph + title
+     stacked), menu to the top-right corner, so the centre column is all
+     activity. The column's left edge sits at 50vw - --col-w / 2. */
+  .app:has(.activity-bar) { padding-top: var(--space-4); }
+  .app:has(.activity-bar) .header {
+    position: fixed;
+    z-index: 5;
+    top: max(var(--space-4), env(safe-area-inset-top));
+    left: max(var(--space-5), env(safe-area-inset-left));
+    right: max(var(--space-5), env(safe-area-inset-right));
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: 0;
+    pointer-events: none;   /* the bar spans the page; only its controls catch taps */
+  }
+  .app:has(.activity-bar) .header > * { pointer-events: auto; }
+  .app:has(.activity-bar) .header__lede {
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: calc(50vw - var(--col-w, 640px) / 2 - 2 * var(--space-5));
+  }
+  .app:has(.activity-bar) .header h1 { font-size: 26px; overflow-wrap: anywhere; }
+  .app:has(.activity-bar) .header__actions { position: absolute; top: 0; right: 0; }
+  .app:has(.activity-bar) .header + * { margin-top: 0; }
+}
