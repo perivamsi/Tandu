@@ -266,7 +266,7 @@ object Checkers extends Activity:
         cls := "center",
         div(cls := "player-badge", child.text <-- statusSignal)
       ),
-      div(
+      tandu.ui.Components.fit("1")(div(
         cls := "board ck-board",
         styleAttr := s"grid-template-columns: repeat($Size, 1fr);",
         (0 until Size * Size).map { i =>
@@ -295,5 +295,5 @@ object Checkers extends Activity:
             onClick --> (_ => if dark then onTap(i))
           )
         }
-      )
+      ))
     )

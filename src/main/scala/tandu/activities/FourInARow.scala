@@ -235,7 +235,7 @@ object FourInARow extends Activity:
           child.maybe <-- active.map(_.map(_ => span(cls := "c4-badge-disc")))
         )
       ),
-      div(
+      tandu.ui.Components.fit(s"$Cols / $Rows")(div(
         cls := "board c4-board",
         cls("is-locked") <-- isLocked,
         styleAttr := s"grid-template-columns: repeat($Cols, 1fr);",
@@ -259,7 +259,7 @@ object FourInARow extends Activity:
             )
           }
         }
-      ),
+      )),
       div(
         cls := "row no-print",
         styleAttr := "justify-content: center;",

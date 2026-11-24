@@ -220,7 +220,7 @@ object WordSearch extends Activity:
 
     div(
       cls := "stack-lg",
-      div(
+      tandu.ui.Components.fit("1")(div(
         cls := "word-search-grid",
         styleAttr := s"--ws-size: ${v.size}",
         onPointerDown --> { ev =>
@@ -262,7 +262,7 @@ object WordSearch extends Activity:
             )
           }
         }
-      ),
+      )),
       wordList(state.signal),
       child <-- state.signal.map(_.won).distinct.map {
         case true  => wonView(newGame)

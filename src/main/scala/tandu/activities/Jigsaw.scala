@@ -4,7 +4,7 @@ import com.raquo.laminar.api.L.*
 import org.scalajs.dom
 import tandu.{AppState, Page, Routing}
 import tandu.i18n.Strings
-import tandu.ui.{Components, Mode, ModeChooser}
+import tandu.ui.{Components, Landscape, Mode, ModeChooser}
 import tandu.ui.Components.s
 import tandu.ui.DomExt.*
 
@@ -38,12 +38,37 @@ object Jigsaw extends Activity:
 
   /** The board is drawn in this square user-unit space and scaled to fit by the
     * SVG viewBox, so all piece maths is resolution-independent. The tray for
-    * loose pieces sits below it. */
+    * loose pieces sits below it, or beside it on landscape tablets (where
+    * height, not width, is scarce). */
   private val Board   = 600.0
   private val TrayGap = Board * 0.05
   private val TrayTop = Board + TrayGap
   private val TrayH   = Board * 0.85
   private val ViewH   = TrayTop + TrayH
+  private val TrayW   = Board * 0.6
+  private val ViewW   = Board + TrayGap + TrayW   // side-tray layout
+
+  private final case class Rect(x: Double, y: Double, w: Double, h: Double):
+    def contains(pt: Pt): Boolean = pt._1 >= x && pt._1 <= x + w && pt._2 >= y && pt._2 <= y + h
+
+  private def trayRect(side: Boolean): Rect =
+    if side then Rect(Board + TrayGap, 0, TrayW, Board) else Rect(0, TrayTop, Board, TrayH)
+
+  /** Tray position for a piece centre, from (u, v) in 0..1, inset by most of a
+    * cell so the whole piece stays in the tray. */
+  private def inTray(side: Boolean, uv: Pt, cw: Double, ch: Double): Pt =
+    val r  = trayRect(side)
+    val mx = math.min(cw * 0.6, r.w / 2)
+    val my = math.min(ch * 0.6, r.h / 2)
+    (r.x + mx + uv._1 * (r.w - 2 * mx), r.y + my + uv._2 * (r.h - 2 * my))
+
+  /** Inverse of `inTray`, clamped: where in the tray (0..1) a centre sits. */
+  private def trayUv(side: Boolean, pt: Pt, cw: Double, ch: Double): Pt =
+    val r  = trayRect(side)
+    val mx = math.min(cw * 0.6, r.w / 2)
+    val my = math.min(ch * 0.6, r.h / 2)
+    def norm(v: Double, lo: Double, span: Double) = if span <= 0 then 0.5 else math.max(0.0, math.min(1.0, (v - lo) / span))
+    (norm(pt._1, r.x + mx, r.w - 2 * mx), norm(pt._2, r.y + my, r.h - 2 * my))
 
   /** How close (as a fraction of the smaller cell dimension) a dropped piece
     * must be to its home before it snaps in. */
@@ -122,11 +147,13 @@ object Jigsaw extends Activity:
       cols: Int,
       salt: Int,                 // makes clipPath ids unique across regenerations
       pieces: Vector[Piece],
-      scatter: Vector[Pt]        // initial offset (from home) for each piece
-  )
+      scatter: Vector[Pt]        // each piece's starting tray position, (u, v) in 0..1
+  ):
+    def cellW: Double = Board / cols
+    def cellH: Double = Board / rows
 
   /** Build a fresh puzzle: random shared-edge signs, one outline path per piece,
-    * and a random scatter of every piece into the tray below the board. */
+    * and a random scatter of every piece into the tray (layout-independent). */
   private def buildPuzzle(image: String, v: Variant, rng: Random): Puzzle =
     val rows = v.rows
     val cols = v.cols
@@ -163,12 +190,7 @@ object Jigsaw extends Activity:
       Piece(r * cols + c, r, c, pieceD(r, c), (c + 0.5) * cw, (r + 0.5) * ch)
     }.flatten
 
-    val pad = math.min(cw, ch) * 0.6
-    val scatter = pieces.map { p =>
-      val tx = pad + rng.nextDouble() * (Board - 2 * pad)
-      val ty = TrayTop + ch * 0.6 + rng.nextDouble() * (TrayH - ch * 1.2)
-      (tx - p.homeCx, ty - p.homeCy)
-    }
+    val scatter = pieces.map(_ => (rng.nextDouble(), rng.nextDouble()))
 
     Puzzle(image, rows, cols, rng.nextInt(1000000), pieces, scatter)
 
@@ -245,8 +267,24 @@ object Jigsaw extends Activity:
   final case class BoardSt(pieces: Vector[PieceSt]):
     def solved: Boolean = pieces.forall(_.placed)
 
-  private def initialBoard(p: Puzzle): BoardSt =
-    BoardSt(p.scatter.map(o => PieceSt(o, false)))
+  private def initialBoard(p: Puzzle, side: Boolean): BoardSt =
+    BoardSt(p.pieces.zip(p.scatter).map { (pc, uv) =>
+      val (tx, ty) = inTray(side, uv, p.cellW, p.cellH)
+      PieceSt((tx - pc.homeCx, ty - pc.homeCy), placed = false)
+    })
+
+  /** The tray moved (device rotated): carry loose pieces still in the old tray
+    * to the same relative spot in the new one. Placed pieces, and loose ones
+    * the child parked over the board, stay where they are. */
+  private def moveTray(p: Puzzle, b: BoardSt, side: Boolean): BoardSt =
+    val boardRect = Rect(0, 0, Board, Board)
+    BoardSt(p.pieces.zip(b.pieces).map { (pc, st) =>
+      val centre = (pc.homeCx + st.offset._1, pc.homeCy + st.offset._2)
+      if st.placed || boardRect.contains(centre) then st
+      else
+        val (tx, ty) = inTray(side, trayUv(!side, centre, p.cellW, p.cellH), p.cellW, p.cellH)
+        st.copy(offset = (tx - pc.homeCx, ty - pc.homeCy))
+    })
 
   // ---------- UI ----------
 
@@ -333,17 +371,26 @@ object Jigsaw extends Activity:
     )
 
   private def boardView(puzzle: Puzzle, peek: Var[Boolean], onNew: () => Unit): HtmlElement =
-    val board = Var(initialBoard(puzzle))
+    val board = Var(initialBoard(puzzle, Landscape.now()))
     val solved = board.signal.map(_.solved).distinct
+    val side   = Landscape.signal
+    // Once solved every piece is home, so the tray is empty — crop the viewBox
+    // to just the board so the finished picture sits flush above the win card
+    // instead of leaving a blank gap.
+    val viewBox: Signal[(Double, Double)] =
+      solved.combineWith(side).map {
+        case (true, _)      => (Board, Board)
+        case (false, true)  => (ViewW, Board)
+        case (false, false) => (Board, ViewH)
+      }
     div(
       cls := "stack-lg",
-      svg.svg(
+      side.changes --> (sd => board.update(moveTray(puzzle, _, sd))),
+      Components.fit(viewBox.map((w, h) => s"${w.toInt} / ${h.toInt}"))(svg.svg(
         svg.cls := "jigsaw-svg",
-        // Once solved every piece is home, so the tray is empty — crop the
-        // viewBox to just the board so the finished picture sits flush above
-        // the win card instead of leaving a tall blank gap.
         svg.cls("is-solved") <-- solved,
-        svg.viewBox <-- solved.map(s => if s then s"0 0 ${Board.toInt} ${Board.toInt}" else s"0 0 ${Board.toInt} ${ViewH.toInt}"),
+        svg.cls("jigsaw-svg--side") <-- side,
+        svg.viewBox <-- viewBox.map((w, h) => s"0 0 ${w.toInt} ${h.toInt}"),
         svg.defs(
           // The picture is declared once and every piece (and the ghost) draws
           // it via <use>, so the multi-KB data URL isn't duplicated per piece.
@@ -374,14 +421,17 @@ object Jigsaw extends Activity:
         ),
         svg.line(
           svg.cls := "jigsaw-tray-divider",
-          svg.x1 := "0", svg.y1 := (Board + TrayGap / 2).toString,
-          svg.x2 := Board.toString, svg.y2 := (Board + TrayGap / 2).toString
+          // Between board and tray: horizontal below it, or vertical beside it.
+          svg.x1 <-- side.map(sd => (if sd then Board + TrayGap / 2 else 0.0).toString),
+          svg.y1 <-- side.map(sd => (if sd then 0.0 else Board + TrayGap / 2).toString),
+          svg.x2 <-- side.map(sd => (if sd then Board + TrayGap / 2 else Board).toString),
+          svg.y2 <-- side.map(sd => (if sd then Board else Board + TrayGap / 2).toString)
         ),
         svg.g(
           svg.cls := "jigsaw-pieces",
           puzzle.pieces.map(p => renderPiece(p, puzzle, board))
         )
-      ),
+      )),
       child <-- solved.map {
         case false => emptyNode
         case true =>
@@ -422,7 +472,7 @@ object Jigsaw extends Activity:
           val g     = ev.currentTarget.asInstanceOf[dom.SVGGElement]
           val svgEl = g.ownerSVGElement
           val rect  = svgEl.getBoundingClientRect()
-          scale    = Board / rect.width
+          scale    = svgEl.viewBox.baseVal.width / rect.width
           startCx  = ev.clientX
           startCy  = ev.clientY
           startOff = board.now().pieces(p.idx).offset

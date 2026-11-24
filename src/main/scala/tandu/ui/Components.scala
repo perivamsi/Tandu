@@ -379,6 +379,18 @@ object Components:
 
   def s(f: Strings => String): Signal[String] = AppState.strings.map(f)
 
+  /** Wraps an activity's main board (grid, SVG or canvas). On landscape
+    * tablets the page becomes exactly one screen tall and the board takes
+    * whatever height the surrounding status and controls leave, keeping its
+    * `aspect` (width / height, e.g. "7 / 6"). Elsewhere the wrapper is inert.
+    * See `.fit` in styles.css. */
+  def fit(aspect: String)(board: Modifier[HtmlElement]): HtmlElement =
+    div(cls := "fit", styleAttr := s"--fit-ar: $aspect;", board)
+
+  /** As `fit`, for a board whose shape changes while it's on screen. */
+  def fit(aspect: Signal[String])(board: Modifier[HtmlElement]): HtmlElement =
+    div(cls := "fit", styleAttr <-- aspect.map(a => s"--fit-ar: $a;"), board)
+
   def modal(
       isOpen: Var[Boolean],
       title: Signal[String],

@@ -472,7 +472,7 @@ object Sudoku extends Activity:
     }.distinct
     val symbolsSig = stateSig.map(_.symbols).distinct
     val conflictsSig = stateSig.map(_.board).distinct.map(conflictSet(v, _))
-    div(
+    tandu.ui.Components.fit("1")(div(
       cls := "sudoku-board",
       cls(s"sudoku-board--${v.size}") := v.size != 9,
       styleAttr := gridTemplate(v.size),
@@ -515,7 +515,7 @@ object Sudoku extends Activity:
           )
         }
       }
-    )
+    ))
 
   private def numberPad(
       v: Variant,

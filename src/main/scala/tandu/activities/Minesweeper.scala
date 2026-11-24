@@ -272,7 +272,7 @@ object Minesweeper extends Activity:
       onCellTap: (Int, Int) => Unit,
       onCellFlag: (Int, Int) => Unit
   ): HtmlElement =
-    div(
+    tandu.ui.Components.fit(s"${v.cols} / ${v.rows}")(div(
       cls := "ms-board",
       styleAttr := s"grid-template-columns: repeat(${v.cols}, 1fr);",
       (0 until v.rows).flatMap { r =>
@@ -289,7 +289,7 @@ object Minesweeper extends Activity:
           )
         }
       }
-    )
+    ))
 
   private def cellContent(cell: Cell): HtmlElement =
     if !cell.revealed then

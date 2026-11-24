@@ -323,13 +323,13 @@ object GuideRobot extends Activity:
       program.signal.combineWith(editable).map((prog, ed) => prog.isEmpty || !ed)
 
     val board =
-      div(
+      tandu.ui.Components.fit("1")(div(
         cls := "robot-board",
         styleAttr <-- puzzle.signal.map(p => s"--robot-size: ${p.size}"),
         children <-- puzzle.signal.combineWith(robot.signal, gotStar.signal).map((p, bot, star) =>
           boardCells(p, bot, star, v.turns)
         )
-      )
+      ))
 
     def removeAt(idx: Int): Unit =
       whenEditing(program.update(p => if idx >= 0 && idx < p.length then p.patch(idx, Nil, 1) else p))

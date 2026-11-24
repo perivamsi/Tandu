@@ -141,7 +141,7 @@ object HomePage:
         // stays the most prominent thing here without competing with the grid.
         workbookHero(),
         div(
-          cls := "stack",
+          cls := "stack home-tools",
           Tools.all.map: t =>
             Components.tile(
               s(t.name),

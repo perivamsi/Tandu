@@ -268,7 +268,7 @@ object Maze extends Activity:
           case _            => ()
       },
       p(cls := "maze-instruction muted center no-print", child.text <-- s(_.maze.instruction)),
-      svg.svg(
+      tandu.ui.Components.fit(s"${v.cols} / ${v.rows}")(svg.svg(
         svg.cls := "maze-svg",
         svg.viewBox <-- gridSig.map(g => s"0 0 ${g.cols * CELL} ${g.rows * CELL}"),
         onPointerDown --> { ev =>
@@ -303,7 +303,7 @@ object Maze extends Activity:
         svg.circle(svg.cls := "maze-start", svg.cx := cx(0).toString, svg.cy := cy(0).toString, svg.r := "1.5"),
         markerText("maze-goal", gridSig.map(g => cx(g.cols - 1)), gridSig.map(g => cy(g.rows - 1)), "🧀"),
         markerText("maze-avatar", state.signal.map(p => cx(p.head._2)), state.signal.map(p => cy(p.head._1)), "🐭")
-      ),
+      )),
       child <-- state.signal.map(_.won).distinct.map {
         case true  => wonView(newMaze)
         case false => controls(clearPath, newMaze)

@@ -200,7 +200,7 @@ object Memory extends Activity:
         scoreView(Player.P1, state.signal),
         scoreView(Player.P2, state.signal)
       ),
-      div(
+      tandu.ui.Components.fit(s"${v.cols} / ${v.pairs * 2 / v.cols}")(div(
         cls := "board mem-board",
         styleAttr := s"grid-template-columns: repeat(${v.cols}, 1fr);",
         (0 until v.pairs * 2).map { i =>
@@ -213,7 +213,7 @@ object Memory extends Activity:
             onClick --> (_ => tap(i))
           )
         }
-      ),
+      )),
       div(
         cls := "row no-print",
         styleAttr := "justify-content: center;",
